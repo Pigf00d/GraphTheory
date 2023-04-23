@@ -25,8 +25,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>jgrapht-core</groupId>
-			<artifactId>graphs</artifactId>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
 			<version>1.5.1</version>
 		</dependency>
 	</dependencies>
