@@ -6,10 +6,13 @@ import java.util.*;
 import javax.swing.JPanel;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 
 
-class Sudoku extends JPanel{
+class Sudoku extends JPanel implements ActionListener{
 
     private int[][] board;
     private ArrayList<Integer>[] squares;
@@ -17,6 +20,7 @@ class Sudoku extends JPanel{
     private ArrayList<Integer>[] cols;
     private static int myWidth = 900;
     private static int myHeight = 900;
+    private JButton solve;
 
     public Sudoku(String coords){
     	File coord_file = new File(coords);   
@@ -116,6 +120,12 @@ class Sudoku extends JPanel{
     		}
     	}
     	
+    	solve = new JButton("Solution");
+    	add(solve);
+    	solve.setVisible(true);
+    	solve.addActionListener(this);
+    	solve.setBounds((2*myWidth)/5, 30, 100, 50);
+    	
     }
 
     //gets a value at a certain (x,y) coordinate
@@ -141,12 +151,19 @@ class Sudoku extends JPanel{
     	int sq_i = 3*(x/3)+(y/3);
     	
     	for(int i= 1; i<=9; i++) {
-    		if(squares[sq_i].indexOf(i) == -1 && rows[y].indexOf(i) == -1 && cols[y].indexOf(i) == -1) {
+    		
+    		
+    		if(squares[sq_i].indexOf(i) == -1 && rows[x].indexOf(i) == -1 && cols[y].indexOf(i) == -1) {
     			pCol.add(i);
     		}
     		
     	}
     	
+    	System.out.print("("+x+","+y+"): ");
+    	for(Integer a: pCol) {
+    		System.out.print(a+", ");
+    	}
+    	System.out.println();
     	return pCol;
     	
     }
@@ -164,19 +181,24 @@ class Sudoku extends JPanel{
     		 boolean hasOne = false;
     		 
     		 //used for backtracking
-    		 ArrayList<int[][]> pastBoards = new ArrayList<int[][]>();    		 
+    		 ArrayList<int[][]> pastBoards = new ArrayList<int[][]>();
+    		 //keeps track of the past coordinates where each fork is met 
+    		 ArrayList<int[]> pastCoords = new ArrayList<int[]>();
+    		 ArrayList<ArrayList<Integer>> potCols = new ArrayList<ArrayList<Integer>>();
     		 
     		 
     		//holds the coloring of the coords with the smallest number of colors 
-    		 int[] minCoords = {0,0};
-    		 int minCol = potentialColors(0,0).size();
+    		 int[] minCoords = new int[2];
+    		 int minCol = 10;
     		 
     		 //first checks the board for naked singles
     		 for(int x=0; x<9; x++) {
     			 for(int y=0; y<9; y++) {
+    				 
     				 if(board[x][y] == 0) {
-	    				 
+	    				 System.out.print(board[x][y]);
     					 pCol = potentialColors(x,y);
+    					 
     					 if(pCol.size() == 0) {
     						 board = pastBoards.get(0);
     						 pastBoards.remove(0);
@@ -204,6 +226,7 @@ class Sudoku extends JPanel{
     				 else {
     					 numColored++;
     				 }
+    				 
 	    				 
     			 }
     		 }
@@ -211,8 +234,11 @@ class Sudoku extends JPanel{
     		 if(numColored<81 && !hasOne) {
     			 int[][] pastBoard = board;
     			 pastBoards.add(0, pastBoard);
-    			 setVal(minCoords[0], minCoords[1], potentialColors(minCoords[0], minCoords[1]).get(0));
-    			
+    			 pCol = potentialColors(minCoords[0], minCoords[1]);
+    			 setVal(minCoords[0], minCoords[1], pCol.remove(0));
+    			 
+    			 pastCoords.add(minCoords);
+    			 potCols.add(pCol);
     		 }
     		 
         		 
@@ -232,19 +258,14 @@ class Sudoku extends JPanel{
     	}
     }
 
-    public static void main(String[] args){
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if(e.getSource() == solve) {
+			solve();
+			repaint();
+		}
+		
+	}
 
-//    	JFrame frame = new JFrame("Sudoku Solver");
-//	    frame.setSize(myWidth, myHeight);
-//	    frame.setLocation(0,0);
-//	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//	       
-//	    frame.setContentPane(new Sudoku("testboard0.txt"));
-//	    frame.setVisible(true);
-//        
-//        //Sudoku s = new Sudoku(coords);
-//        //if(s != null)
-//        	//s.printBoard();
-        	
-    }
 }
