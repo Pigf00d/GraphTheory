@@ -19,6 +19,6 @@ public class SudokuDriver extends JPanel{
         if(s != null)
         	s.printBoard();
         	s.solve();
-        	
+        	s.printBoard();
     }
 }
